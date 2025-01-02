@@ -10,8 +10,9 @@ import { Heart, MapPinIcon, Trash2Icon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import useFetch from "@/hooks/use-fetch";
-import { saveJob } from "@/api/apiJobs";
+import { deleteJob, saveJob } from "@/api/apiJobs";
 import { useEffect, useState } from "react";
+import { BarLoader } from "react-spinners";
 
 const JobCard = ({
   job,
@@ -19,14 +20,13 @@ const JobCard = ({
   savedInit = false,
   onJobSaved = () => {},
 }) => {
-
-  const [saved, setSaved] = useState(savedInit)
+  const [saved, setSaved] = useState(savedInit);
   const {
     fn: fnSavedJob,
     data: savedJob,
     loading: loadingSavedJob,
-  } = useFetch(saveJob,{
-    alreadySaved:saved
+  } = useFetch(saveJob, {
+    alreadySaved: saved,
   });
 
   const { user } = useUser();
@@ -39,12 +39,24 @@ const JobCard = ({
     onJobSaved();
   };
 
-  useEffect(() =>{
-    if(savedJob !== undefined) setSaved(savedJob?.length > 0);
-  }, [savedJob])
+  const { loading: loadingDeleteJob, fn: fnDeleteJob } = useFetch(deleteJob, {
+    job_id: job.id,
+  });
+
+  const handleDeleteJob = async () => {
+    await fnDeleteJob();
+    onJobSaved();
+  };
+
+  useEffect(() => {
+    if (savedJob !== undefined) setSaved(savedJob?.length > 0);
+  }, [savedJob]);
 
   return (
-    <Card className='flex flex-col'>
+    <Card className="flex flex-col">
+      {loadingDeleteJob && (
+        <BarLoader className="mt-4" width={"100%"} color="#36d7b7"/>
+      )}
       <CardHeader>
         <CardTitle className="flex justify-between font-bold">
           {job.title}
@@ -54,6 +66,7 @@ const JobCard = ({
               fill="red"
               size={18}
               className="text-red-300 cursor-pointer"
+              onClick={handleDeleteJob}
             />
           )}
         </CardTitle>
@@ -83,12 +96,11 @@ const JobCard = ({
             onClick={handleSaveJob}
             disabled={loadingSavedJob}
           >
-            {saved ?
-             (<Heart size={20} stroke="red" fill="red" />)
-             :
-             (<Heart size={20} />)
-             }
-           
+            {saved ? (
+              <Heart size={20} stroke="red" fill="red" />
+            ) : (
+              <Heart size={20} />
+            )}
           </Button>
         )}
       </CardFooter>
