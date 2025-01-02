@@ -3,7 +3,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import "./App.css";
 import AppLayout from "./layouts/app-layout";
 import OnBoarding from "./pages/onboarding";
-import JobPage from "./pages/Job";
+import JobPage from "./pages/job";
 import SavedJobs from "./pages/saved-job";
 import PostJob from "./pages/post-job";
 import MyJobs from "./pages/my-jobs";
